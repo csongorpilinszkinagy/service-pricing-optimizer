@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 
-df = pd.read_csv("data/processed/events_all.csv", parse_dates=["date"])
+df = pd.read_csv("data/processed/long_format.csv", parse_dates=["date"])
 df["revenue"] = df["price"] * df["hours"]
 df["quarter"] = df["date"].dt.quarter
 
