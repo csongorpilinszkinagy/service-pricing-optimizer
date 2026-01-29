@@ -5,7 +5,7 @@ based on historical, customer-level usage data.
 The goal is to identify **optimal price to maximize revenue** using observed behavior rather than
 theoretical demand assumptions.
 
-## Data Ingestion
+## Clean and anonymize
 
 ### Input format
 Raw CSV files are wide-format timesheets:
@@ -24,11 +24,28 @@ Example (simplified):
 - Drops irrelevant billing and address fields
 - Renames columns for internal consistency
 - Anonymizes customers using a salted SHA-256 hash
+
+### Output
+A unified anonymized minimal wide table in data/processed/clean_anonymized.csv
+
+## Reshape wide to long
+
+### Input format
+Example (simplified):
+
+| cursomer_id | price  | 2024-01-10 | 2024-01-17 |
+|----------|--------|------------|------------|
+| a9f31c2e    | 9000   | 2          | 1          |
+| f31aa812    | 11000  | 1          | 0          |
+
+### Processing steps
 - Converts wide date columns into event-level rows
 - Filters out zero or missing hours
 
 ### Output
-A normalized, event-level dataset, saved to data/processed/events_all.csv
+A normalized, event-level dataset, saved to data/processed/long_format.csv
+
+Example (simplified):
 
 | customer_id | date       | price | hours |
 |------------|------------|-------|--------|
@@ -36,7 +53,7 @@ A normalized, event-level dataset, saved to data/processed/events_all.csv
 | a9f31c2e   | 2024-01-17 | 9000  | 1      |
 | f31aa812   | 2024-01-10 | 11000 | 1      |
 
-## Revenue & Pricing Analysis
+## Optimize revenue
 
 ### Feature engineering
 - Revenue is calculated as `price × hours`
@@ -66,25 +83,33 @@ For each quarter:
 - One PNG chart per quarter
 
 ## Reproducibility
-Raw csv data in folder
+Raw csv data in folder:
 
 `data/raw/...`
 
-Install requirements
+Install requirements:
 
 `pip install -r requirements.txt`
 
-Run data transform
+Run data cleaning:
 
-`python ingest.py`
+`python clean_anonymize.py`
 
-Processed data in csv
+Cleaned data in csv:
 
-`data/processed/all_events.csv`
+`data/processed/clean_anonymized.csv`
 
-Run analysis
+Run transform:
 
-`python revenue_analysis.py`
+`python reshape_wide_to_long.py`
+
+Transformed data in csv:
+
+`data/processed/long_format.csv`
+
+Run transform:
+
+`python optimize_revenue.py`
 
 Results in folder
 
